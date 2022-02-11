@@ -1,1 +1,198 @@
-ich bin ein test
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dönertrainer</title>
+  <link rel="stylesheet" href="css/Doenertrainer.css">
+  <script src="Build/Build.js" type="text/javascript" charset="utf-8"></script>
+
+</head>
+
+<body>
+  <div id="left">
+    <div id="interactions">
+      <h2>Interaktionen</h2>
+      <input type="radio" id="workerone" name="workers" value="1" checked>
+      <label for="workerone" id="workeronelabel" >Chef</label>
+      <input type="radio" id="workertwo" name="workers" value="2">
+      <label for="workertwo" id="workertwolabel" >Mitarbeiter 1</label>
+      <input type="radio" id="workerthree" name="workers" value="3"hidden>
+      <label for="workerthree" id="workerthreelabel" hidden>Mitarbeiter 2</label>
+      <br>
+      <h3>Tätigkeit</h3>
+      <label for="cars"></label>
+      <select name="tasks" id="tasks">
+        <option value="0">Bestellung aufnehmen</option>
+        <option value="1">Kochen</option>
+        <option value="2">Bedienen</option>
+        <option value="3">Zutaten Holen</option>
+        <option value="4">Lieferanten anrufen</option>
+      </select>
+      <div id="ordermenu" hidden>
+        <button id="getorder">Bestellung aufnehmen</button>
+      </div>
+      <div id="cookmenu" hidden>
+        <h3>Zutaten</h3>
+        <div>
+          <div class="checkboxes">
+            <div>
+              <input type="checkbox" id="fladenbrot" name="fladenbrot" checked>
+              <label for="fladenbrot">Fladenbrot</label>
+            </div>
+            <div>
+              <input type="checkbox" id="lamacunteig" name="lamacunteig">
+              <label for="lamacunteig">Lamacun-Teig</label>
+            </div>
+            <div>
+              <input type="checkbox" id="yufkateig" name="yufkateig">
+              <label for="yufkateig">Yufka-Teig</label>
+            </div>
+            <div>
+              <input type="checkbox" id="salat" name="salat">
+              <label for="salat">Salat</label>
+            </div>
+            <div>
+              <input type="checkbox" id="kraut" name="kraut">
+              <label for="kraut">Kraut</label>
+            </div>
+            <div>
+              <input type="checkbox" id="rotesosse" name="rotesosse">
+              <label for="rotesosse">Rote Soße</label>
+            </div>
+          </div>
+          <div class="checkboxes">
+            <div>
+              <input type="checkbox" id="zwiebeln" name="zwiebeln" checked>
+              <label for="zwiebeln">Zwiebeln</label>
+            </div>
+            <div>
+              <input type="checkbox" id="tomaten" name="tomaten">
+              <label for="Tomaten">Tomaten</label>
+            </div>
+            <div>
+              <input type="checkbox" id="kaese" name="kaese">
+              <label for="kaese">Käse</label>
+            </div>
+            <div>
+              <input type="checkbox" id="hackfleisch" name="hackfleisch">
+              <label for="salat">hackfleisch</label>
+            </div>
+            <div>
+              <input type="checkbox" id="doenerfleisch" name="doenerfleisch">
+              <label for="doenerfleisch">Dönerfleisch</label>
+            </div>
+            <div>
+              <input type="checkbox" id="weissesosse" name="weissesosse">
+              <label for="weissesosse">Weiße Soße</label>
+            </div>
+          </div>
+        </div>
+        <button id="cook">Kochen</button>
+      </div>
+      <div id="servemenu" hidden>
+        <h3>Tisch</h3>
+        <input type="radio" id="tableone" name="selecttable" value="0" checked>
+        <label for="t1">1</label>
+        <input type="radio" id="tabletwo" name="selecttable" value="1">
+        <label for="t2">2</label>
+        <input type="radio" id="tablethree" name="selecttable" value="2">
+        <label for="t3">3</label>
+        <input type="radio" id="tablefour" name="selecttable" value="3">
+        <label for="t4">4</label>
+        <input type="radio" id="tablefive" name="selecttable" value="4">
+        <label for="t5">5</label>
+        <input type="radio" id="tablesix" name="selecttable" value="5">
+        <label for="t6">6</label>
+        <input type="radio" id="tableseven" name="selecttable" value="6">
+        <label for="t6">7</label>
+        <br>
+        <select name="selectReadyFood" id="selectReadyFood">
+          <option value="Foodcounter">lamacunteig</option>
+        </select>
+        <br>
+        <button id="cook">bedienen</button>
+      </div>
+      <div id="gowarehousemenu" hidden>
+        <br>
+      <button id="getingredients" >2 Zutaten aus dem Lager holen</button>
+      </div>
+      <div id="deliverwarehousemenu">
+        <br>
+      <button id="fillupwarehous" >Lieferanten anrufen</button>
+      </div>
+    </div>
+
+    <div id="inventory">
+      <h2>Wahrenbestände</h2>
+
+    </div>
+  </div>
+  <div id="starSettings">
+    <img src="pictures/logo.png" width="171px" height="226px">
+    <h3 id="labelworkervalue" >Arbeiterzahl: 2</h3>
+    <input type="range" id="workervalue" name="workervalue" min="1" max="3">
+    <h3 id="labelwarehousecapacity">Wahrenhauskapazität: 8</h3>
+    <input type="range" id="warehousecapacity" name="warehousecapacity" min="5" max="10">
+    <h3 id="labelcustomerperminute">Besucher pro Minute: 8</h3>
+    <input type="range" id="customerperminute" name="customerperminute" min="5" max="10">
+    <h3 id="labeloverload">Überforderung cooldown ( 2 Sekunden)</h3>
+    <input type="range" id="overload" name="overload" min="1" max="3">
+    <h3 id="labelsleep">einschlafen cooldown ( 9 Sekunden)</h3>
+    <input type="range" id="sleep" name="sleep" min="7" max="10">
+    <br>
+    <button id="startgame">Start Game</button>
+  </div>
+  <canvas id="canvas" height="1080" width="876"hidden></canvas>
+  <div id="right">
+    <div id="orders">
+      <h2>Kochliste</h2>
+      <table>
+        <tr>
+          <td>Tisch 1:</td>
+          <td>bestellungen</td>
+        </tr>
+        <tr>
+          <td>Tisch 2:</td>
+          <td>bestellungen</td>
+        </tr>
+        <tr>
+          <td>Tisch 3:</td>
+          <td>bestellungen</td>
+        </tr>
+        <tr>
+          <td>Tisch 4:</td>
+          <td>bestellungen</td>
+        </tr>
+        <tr>
+          <td>Tisch 5:</td>
+          <td>bestellungen</td>
+        </tr>
+        <tr>
+          <td>Tisch 6:</td>
+          <td>bestellungen</td>
+        </tr>
+        <tr>
+          <td>Tisch 7:</td>
+          <td>bestellungen</td>
+        </tr>
+      </table>
+    </div>
+    <div id="sadisfaction">
+      <h2>Zufriedenheit</h2>
+      <table>
+        <tr>
+          <td>Fehler:</td>
+          <td>2</td>
+        </tr>
+        <tr>
+          <td>Erledigte Bestellungen:</td>
+          <td>5/31</td>
+        </tr>
+    </div>
+  </div>
+</body>
+
+</html>
