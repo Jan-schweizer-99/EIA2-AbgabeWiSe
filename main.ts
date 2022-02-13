@@ -1,19 +1,20 @@
 namespace Doenertrainer {
 
-    export let crc2: CanvasRenderingContext2D;
+    export let ctx: CanvasRenderingContext2D;
 
     //let sky: Sky = new Sky(2);
     window.addEventListener("load", hndLoad);
 
-    let workerValue: number;
+    let workerValue: number = 2;
     let warehouseCapacity: number;
     let customerPerMinute: number;
     let overload: number;
     let sleep: number;
+    let worker: Worker[] = [];
+    let deliveryman: Deliveryman;
 
     export let background: HTMLImageElement = new Image();
     background.src = "pictures/background.png";
-
 
 
     function hndLoad(_event: Event): void {
@@ -29,7 +30,7 @@ namespace Doenertrainer {
 
 
 
-        crc2 = canvas.getContext("2d")!;
+        ctx = canvas.getContext("2d")!;
         workerValue.addEventListener("input", updateStartevalues);
         warehouseCapacity.addEventListener("input", updateStartevalues);
         customerPerMinute.addEventListener("input", updateStartevalues);
@@ -45,15 +46,46 @@ namespace Doenertrainer {
         let canvas: HTMLCanvasElement = <HTMLCanvasElement>document.querySelector("canvas");
         canvas.hidden = false;
         starScreen.hidden = true;
+
+
+        //spawn workers
+        if (workerValue == 3) {
+            worker[0] = new Worker(58, 686, 0);
+            worker[1] = new Worker(98, 686, 1);
+            worker[2] = new Worker(137, 686, 2);
+        }
+        if (workerValue == 2) {
+            worker[0] = new Worker(58, 686, 0);
+            worker[1] = new Worker(98, 686, 1);
+        }
+        if (workerValue == 1) {
+            worker[0] = new Worker(58, 686, 0);
+        }
+        // spawn Deliveryman
+        deliveryman = new Deliveryman(405, 1109);
+
         setInterval(update, 50);
 
     }
     function update(): void {
-        crc2.drawImage(background, 0, 0);
-        console.log("peter");
+        ctx.drawImage(background, 0, 0);
+        if (workerValue == 3) {
+            worker[0].draw();
+            worker[1].draw();
+            worker[2].draw();
+        }
+        if (workerValue == 2) {
+            worker[0].draw();
+            worker[1].draw();
+        }
+        if (workerValue == 1) {
+            worker[0].draw();
+        }
+        deliveryman.draw();
+
     }
     function updatetaskmenu(_event: Event): void {
-        
+
         let orderMenu: HTMLDivElement = <HTMLDivElement>document.querySelector("Div#ordermenu");
         let cookMenu: HTMLDivElement = <HTMLDivElement>document.querySelector("Div#cookmenu");
         let serveMenu: HTMLDivElement = <HTMLDivElement>document.querySelector("Div#servemenu");
@@ -83,7 +115,7 @@ namespace Doenertrainer {
             deliverwarehousemenu.hidden = false;
         }
 
-        
+
     }
 
 
@@ -100,7 +132,7 @@ namespace Doenertrainer {
             let workeronelabel: HTMLLabelElement = <HTMLLabelElement>document.querySelector("label#workeronelabel");
             let workertwolabel: HTMLLabelElement = <HTMLLabelElement>document.querySelector("label#workertwolabel");
             let workerthreelabel: HTMLLabelElement = <HTMLLabelElement>document.querySelector("label#workerthreelabel");
-            
+
             workerone.hidden = true;
             workertwo.hidden = true;
             workerthree.hidden = true;
