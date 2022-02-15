@@ -3,13 +3,17 @@ var Doenertrainer;
 (function (Doenertrainer) {
     //let sky: Sky = new Sky(2);
     window.addEventListener("load", hndLoad);
+    Doenertrainer.queue = 0;
     let workerValue = 2;
     let warehouseCapacity;
     let customerPerMinute;
-    let overload;
-    let sleep;
+    Doenertrainer.overload = 40;
+    Doenertrainer.sleep = 180;
     let worker = [];
+    let customer = [];
     let deliveryman;
+    let selectedWorker = 0;
+    Doenertrainer.timer = 0;
     Doenertrainer.background = new Image();
     Doenertrainer.background.src = "pictures/background.png";
     function hndLoad(_event) {
@@ -21,6 +25,13 @@ var Doenertrainer;
         let sleep = document.querySelector("input#sleep");
         let start = document.querySelector("button#startgame");
         let task = document.querySelector("select#tasks");
+        let workerone = document.querySelector("input#workerone");
+        let workertwo = document.querySelector("input#workertwo");
+        let workerthree = document.querySelector("input#workerthree");
+        let fillupwarehouseButton = document.querySelector("button#fillupwarehous");
+        let cookButton = document.querySelector("button#cook");
+        let getingredientsButton = document.querySelector("button#getingredients");
+        let getorderButton = document.querySelector("button#getorder");
         Doenertrainer.ctx = canvas.getContext("2d");
         workerValue.addEventListener("input", updateStartevalues);
         warehouseCapacity.addEventListener("input", updateStartevalues);
@@ -29,6 +40,13 @@ var Doenertrainer;
         sleep.addEventListener("input", updateStartevalues);
         start.addEventListener("click", startGame);
         task.addEventListener("input", updatetaskmenu);
+        workerone.addEventListener("click", updateUI);
+        workertwo.addEventListener("click", updateUI);
+        workerthree.addEventListener("click", updateUI);
+        fillupwarehouseButton.addEventListener("click", calldeliveryman);
+        cookButton.addEventListener("click", cookfood);
+        getingredientsButton.addEventListener("click", getingredientsfromwarehouse);
+        getorderButton.addEventListener("click", getorder);
     }
     function startGame(_event) {
         let starScreen = document.querySelector("Div#starSettings");
@@ -50,9 +68,13 @@ var Doenertrainer;
         }
         // spawn Deliveryman
         deliveryman = new Doenertrainer.Deliveryman(405, 1109);
+        customer[0] = new Doenertrainer.Customer(912, 1051);
+        customer[1] = new Doenertrainer.Customer(912, 1051);
         setInterval(update, 50);
     }
     function update() {
+        Doenertrainer.timer++;
+        console.log(Doenertrainer.sleep);
         Doenertrainer.ctx.drawImage(Doenertrainer.background, 0, 0);
         if (workerValue == 3) {
             worker[0].draw();
@@ -66,7 +88,30 @@ var Doenertrainer;
         if (workerValue == 1) {
             worker[0].draw();
         }
+        for (let i = 0; i < worker.length; i++) {
+            worker[i].doActivity();
+            worker[i].draw();
+        }
+        deliveryman.doActivity();
         deliveryman.draw();
+        customer[0].doActivity();
+        customer[0].draw();
+        customer[1].doActivity();
+        customer[1].draw();
+    }
+    function updateUI(_event) {
+        if (_event.target.value == "workerone") {
+            selectedWorker = 0;
+            console.log("Arbeiter" + selectedWorker);
+        }
+        if (_event.target.value == "workertwo") {
+            selectedWorker = 1;
+            console.log("Arbeiter" + selectedWorker);
+        }
+        if (_event.target.value == "workerthree") {
+            selectedWorker = 2;
+            console.log("Arbeiter" + selectedWorker);
+        }
     }
     function updatetaskmenu(_event) {
         let orderMenu = document.querySelector("Div#ordermenu");
@@ -80,6 +125,7 @@ var Doenertrainer;
         serveMenu.hidden = true;
         goWarehouseMenu.hidden = true;
         deliverwarehousemenu.hidden = true;
+        //menus
         if (_event.target.value == "0") {
             orderMenu.hidden = false;
         }
@@ -94,6 +140,34 @@ var Doenertrainer;
         }
         if (_event.target.value == "4") {
             deliverwarehousemenu.hidden = false;
+        }
+    }
+    function calldeliveryman(_event) {
+        console.log("call deliveryman");
+        deliveryman.setActivity(1);
+    }
+    function cookfood(_event) {
+        console.log("coockfood");
+        if (worker[selectedWorker].activity == 0) {
+            worker[selectedWorker].setActivity(2);
+        }
+    }
+    function getingredientsfromwarehouse(_event) {
+        console.log("warehouse");
+        if (worker[selectedWorker].activity == 0) {
+            worker[selectedWorker].setActivity(1);
+        }
+    }
+    function getorder(_event) {
+        console.log("go cashbox");
+        if (worker[selectedWorker].activity == 0) {
+            worker[selectedWorker].setActivity(3);
+        }
+    }
+    function serveFood(_event) {
+        console.log("f");
+        if (worker[selectedWorker].activity == 0) {
+            deliveryman.setActivity(4);
         }
     }
     function updateStartevalues(_event) {
@@ -146,16 +220,181 @@ var Doenertrainer;
             console.log(customerPerMinute);
         }
         if (_event.target.id == "overload") {
-            overload = Number(_event.target.value);
-            document.getElementById("labeloverload").innerHTML = "Überforderung cooldown ( " + overload + "Sekunden)";
-            console.log(overload);
+            Doenertrainer.overload = Number(_event.target.value) * 20;
+            document.getElementById("labeloverload").innerHTML = "Überforderung cooldown ( " + Doenertrainer.overload / 20 + "Sekunden)";
+            console.log(Doenertrainer.overload);
         }
         if (_event.target.id == "sleep") {
-            sleep = Number(_event.target.value);
-            document.getElementById("labelsleep").innerHTML = "einschlafen cooldown ( " + sleep + " Sekunden)";
-            console.log(sleep);
+            Doenertrainer.sleep = Number(_event.target.value) * 20;
+            document.getElementById("labelsleep").innerHTML = "einschlafen cooldown ( " + Doenertrainer.sleep / 20 + " Sekunden)";
+            console.log(Doenertrainer.sleep);
         }
     }
+})(Doenertrainer || (Doenertrainer = {}));
+var Doenertrainer;
+(function (Doenertrainer) {
+    class Customer {
+        position;
+        spawnpoint;
+        emotion;
+        activity;
+        worker;
+        //walkpaths
+        walkqueuepath = [340, -27];
+        walkqueuepathDone = [false, false];
+        walkqueue3 = [999];
+        walkqueue3Done = [false];
+        walkqueue2 = [947];
+        walkqueue2Done = [false];
+        walkqueue1 = [896];
+        walkqueue1Done = [false];
+        walkqueueback = [1051, -27];
+        walkqueuebackDone = [false, false];
+        walkstep = 0;
+        constructor(_x, _y) {
+            this.emotion = 0;
+            this.position = new Doenertrainer.Vector(_x, _y);
+            this.spawnpoint = new Doenertrainer.Vector(_x, _y);
+            this.setPosition(_x, _y);
+            this.setSpawnpoint(_x, _y);
+            this.setActivity(0);
+        }
+        setActivity(_activity) {
+            this.activity = _activity; //set activity 0 = walk queue  02 = wait in queue and update  03 = walk out  
+        }
+        setSpawnpoint(_x, _y) {
+            this.spawnpoint.x = _x;
+            this.spawnpoint.y = _y;
+        }
+        doActivity() {
+            if (this.activity == 0) {
+                // walk queue & decide 
+                this.walkthere("left", 0, 8, this.walkstep, this.walkqueuepath, this.walkqueuepathDone);
+                if (this.walkstep == 1 && Doenertrainer.queue <= 3) {
+                    Doenertrainer.queue++;
+                    this.walkstep = 0;
+                    this.activity = 1;
+                }
+                //}
+            }
+            // wait for queue place 3
+            if (this.activity == 1 && Doenertrainer.queue <= 2) {
+                this.walkthere("forward", 0, 8, this.walkstep, this.walkqueue3, this.walkqueue3Done);
+                if (this.walkstep == 1) {
+                    Doenertrainer.queue++;
+                    this.walkstep = 0;
+                    this.activity = 2;
+                }
+            }
+            if (this.activity == 2 && Doenertrainer.queue <= 1) {
+                console.log("help");
+                this.walkthere("forward", 0, 8, this.walkstep, this.walkqueue2, this.walkqueue2Done);
+                if (this.walkstep == 1) {
+                    Doenertrainer.queue++;
+                    this.walkstep = 0;
+                    this.activity = 3;
+                }
+            }
+            if (this.activity == 3 && Doenertrainer.queue <= 0) {
+                this.walkthere("forward", 0, 8, this.walkstep, this.walkqueue1, this.walkqueue1Done);
+                if (this.walkstep == 1) {
+                    Doenertrainer.queue++;
+                    this.walkstep = 0;
+                    this.activity = 2;
+                }
+            }
+        }
+        walkthere(walkdirection, activwalkstep, walkspeed, walkstep, walkpath, walkpathdone) {
+            if (walkpathdone[this.walkstep] == false && this.walkstep == activwalkstep) {
+                for (let i = 0; i < walkspeed; i++) {
+                    if (walkdirection == "backward") {
+                        this.position.y++;
+                    }
+                    if (walkdirection == "forward") {
+                        this.position.y--;
+                    }
+                    if (walkdirection == "left") {
+                        this.position.x--;
+                    }
+                    if (walkdirection == "right") {
+                        this.position.x++;
+                    }
+                    if (this.position.y == walkpath[walkstep]) {
+                        walkpathdone[this.walkstep] = true;
+                        this.walkstep++;
+                        //}
+                        break;
+                    }
+                    if (this.position.x == walkpath[this.walkstep]) {
+                        walkpathdone[this.walkstep] = true;
+                        this.walkstep++;
+                        //}
+                        break;
+                    }
+                }
+            }
+        }
+        walkback(walkdirection, activwalkstep, walkspeed, walkstep, walkpath, walkpathdone) {
+            if (walkpathdone[this.walkstep] == true && this.walkstep == activwalkstep) {
+                for (let i = 0; i < walkspeed; i++) {
+                    if (walkdirection == "backward") {
+                        this.position.y++;
+                    }
+                    if (walkdirection == "forward") {
+                        this.position.y--;
+                    }
+                    if (walkdirection == "left") {
+                        this.position.x--;
+                    }
+                    if (walkdirection == "right") {
+                        this.position.x++;
+                    }
+                    if (this.position.y == walkpath[walkstep]) {
+                        walkpathdone[this.walkstep] = false;
+                        this.walkstep++;
+                        if (walkstep == walkpathdone.length) {
+                            this.setActivity(0);
+                        }
+                        if (this.position.x == this.spawnpoint.x && this.position.y == this.spawnpoint.y) {
+                            console.log(this.position);
+                            console.log(this.spawnpoint);
+                            this.setActivity(0);
+                        }
+                        break;
+                    }
+                    if (this.position.x == walkpath[this.walkstep]) {
+                        walkpathdone[this.walkstep] = false;
+                        this.walkstep++;
+                        if (walkstep == walkpathdone.length) {
+                            this.setActivity(0);
+                        }
+                        if (this.position.x == this.spawnpoint.x && this.position.y == this.spawnpoint.y) {
+                            console.log(this.position);
+                            console.log(this.spawnpoint);
+                            this.setActivity(0);
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+        setPosition(_x, _y) {
+            this.position.x = _x;
+            this.position.y = _y;
+        }
+        draw() {
+            Doenertrainer.ctx.translate(this.position.x, this.position.y);
+            Doenertrainer.drawCustomer();
+            Doenertrainer.ctx.translate(this.position.x, this.position.y);
+            if (this.emotion == 0) { //emotion
+                Doenertrainer.drawEmotionHappy();
+            }
+            if (this.emotion == 1) {
+                Doenertrainer.drawEmotionSad();
+            }
+        }
+    }
+    Doenertrainer.Customer = Customer;
 })(Doenertrainer || (Doenertrainer = {}));
 var Doenertrainer;
 (function (Doenertrainer) {
@@ -190,8 +429,8 @@ var Doenertrainer;
         setActivity(_activity) {
             this.activity = _activity; //set activity //0 = nothing // 1 go warehouse
         }
-        move() {
-            if (this.activity == 0) {
+        doActivity() {
+            if (this.activity == 1) {
                 // walk to warehouse
                 this.walkthere("forward", 0, 8, this.walkstep, this.warehousewalkpath, this.warehousewalkpathDone);
                 this.walkthere("left", 1, 8, this.walkstep, this.warehousewalkpath, this.warehousewalkpathDone);
@@ -269,7 +508,7 @@ var Doenertrainer;
                         if (this.position.x == this.spawnpoint.x && this.position.y == this.spawnpoint.y) {
                             console.log(this.position);
                             console.log(this.spawnpoint);
-                            this.setActivity(1);
+                            this.setActivity(0);
                         }
                         break;
                     }
@@ -277,12 +516,12 @@ var Doenertrainer;
                         walkpathdone[this.walkstep] = false;
                         this.walkstep++;
                         if (walkstep == walkpathdone.length) {
-                            this.setActivity(1);
+                            this.setActivity(0);
                         }
                         if (this.position.x == this.spawnpoint.x && this.position.y == this.spawnpoint.y) {
                             console.log(this.position);
                             console.log(this.spawnpoint);
-                            this.setActivity(1);
+                            this.setActivity(0);
                         }
                         break;
                     }
@@ -290,9 +529,6 @@ var Doenertrainer;
             }
         }
         draw() {
-            if (this.activity == 0) {
-                this.move();
-            }
             Doenertrainer.ctx.translate(this.position.x, this.position.y);
             Doenertrainer.drawDeliveryman();
             Doenertrainer.ctx.translate(this.position.x, this.position.y);
@@ -300,6 +536,137 @@ var Doenertrainer;
         }
     }
     Doenertrainer.Deliveryman = Deliveryman;
+})(Doenertrainer || (Doenertrainer = {}));
+var Doenertrainer;
+(function (Doenertrainer) {
+    class Food {
+        bread;
+        sauce;
+        ingredients = [];
+        ordername;
+        saucename;
+        extraName;
+        position;
+        // constructor(_bread: number, _salad: boolean, _herb: boolean, _onion: boolean, _tomato: boolean, _cheese: boolean, _mincedMeat: boolean, _donerMeat: boolean) {
+        //     this.bread = _bread;
+        //     this.ingredients[0] = _salad;
+        //     this.ingredients[1] = _herb;
+        //     this.ingredients[2] = _onion;
+        //     this.ingredients[3] = _tomato;
+        //     this.ingredients[4] = _cheese;
+        //     this.ingredients[5] = _mincedMeat;
+        //     this.ingredients[5] = _donerMeat;
+        // } 
+        constructor(_recept) {
+            if (_recept == 0) { //lamacun
+                this.bread = 0;
+                this.ingredients[0] = 0; //salad
+                this.ingredients[1] = 0; //herb
+                this.ingredients[2] = 1; //onion
+                this.ingredients[3] = 1; //tomato
+                this.ingredients[4] = 1; //cheese
+                this.ingredients[5] = 1; //minced meet
+                this.ingredients[6] = 0; //doner meat
+                this.sauce = 0;
+            }
+            if (_recept == 1) { //doner
+                this.bread = 1;
+                this.ingredients[0] = 1; //salad
+                this.ingredients[1] = 1; //herb
+                this.ingredients[2] = 1; //onion
+                this.ingredients[3] = 1; //tomato
+                this.ingredients[4] = 1; //cheese
+                this.ingredients[5] = 0; //minced meet
+                this.ingredients[6] = 1; //doner meat
+                this.sauce = 0;
+            }
+            if (_recept == 2) { //yufka
+                this.bread = 2;
+                this.ingredients[0] = 1; //salad
+                this.ingredients[1] = 1; //herb
+                this.ingredients[2] = 1; //onion
+                this.ingredients[3] = 1; //tomato
+                this.ingredients[4] = 0; //cheese
+                this.ingredients[5] = 0; //minced meet
+                this.ingredients[6] = 1; //doner meat
+                this.sauce = 0;
+            }
+        }
+        getnameoforder() {
+            if (this.bread == 0) {
+                this.ordername = "Lamacun";
+            }
+            if (this.bread == 1) {
+                this.ordername = "Döner";
+            }
+            if (this.bread == 2) {
+                this.ordername = "Yufka";
+            }
+        }
+        setExtraingredient(_ingredient) {
+            if (this.ingredients[_ingredient] == 0) {
+                this.ingredients[_ingredient]++;
+                if (_ingredient == 0) {
+                    this.extraName = "mit Salat";
+                }
+                if (_ingredient == 1) {
+                    this.extraName = "mit Kraut";
+                }
+                if (_ingredient == 2) {
+                    this.extraName = "mit Zwiebel";
+                }
+                if (_ingredient == 3) {
+                    this.extraName = "mit Tomate";
+                }
+                if (_ingredient == 4) {
+                    this.extraName = "mit Käse";
+                }
+                if (_ingredient == 5) {
+                    this.extraName = "mit Hackfleisch";
+                }
+                if (_ingredient == 6) {
+                    this.extraName = "mit Dönerfleisch";
+                }
+            }
+        }
+        setsauce(_sauce) {
+            if (_sauce == 0) { //no sauce
+                this.sauce = 0;
+                this.saucename = "(keine Soße)";
+            }
+            if (_sauce == 1) { //white sauce
+                this.sauce = 1;
+                this.saucename = "(Weisse Soße)";
+            }
+            if (_sauce == 2) { //red sauce
+                this.sauce = 2;
+                this.saucename = "(Rote Soße)";
+            }
+        }
+        setbread(_bread) {
+            this.bread = _bread;
+        }
+        //get values
+        getingredient(_ingredient) {
+            return this.ingredients[_ingredient];
+        }
+        getbread(_ingredient) {
+            return this.bread;
+        }
+        draw(_x, _y) {
+            Doenertrainer.ctx.translate(_x, _y);
+            if (this.bread == 0) {
+                Doenertrainer.drawLamacun();
+            }
+            if (this.bread == 1) {
+                Doenertrainer.drawDoner();
+            }
+            if (this.bread == 3) {
+                Doenertrainer.drawYufka();
+            }
+        }
+    }
+    Doenertrainer.Food = Food;
 })(Doenertrainer || (Doenertrainer = {}));
 var Doenertrainer;
 (function (Doenertrainer) {
@@ -426,18 +793,200 @@ var Doenertrainer;
 (function (Doenertrainer) {
     class Worker {
         position;
+        spawnpoint;
         emotion;
-        activ;
+        activity;
         worker;
+        timer = 0;
+        overload = 0;
+        timeafterwork; //
+        //walkpaths
+        warehousewalkpath = [274, 741, 668, 336, 166, 476];
+        warehousewalkpathback = [336, 668, 741, 274, 686];
+        warehousewalkpathDone = [false, false, false, false, false, false, false];
+        //cookpahs
+        cookwalkpath = [56, 745, 79, 821, 98, 884, 138, 874, 823, 765, 686];
+        cookwalkpathDone = [false, false, false, false, false, false, false, false, false, false, false, false];
+        cashboxwalkpath = [139, 765, 686];
+        cashboxpathDone = [false, false, false, false];
+        walkstep = 0;
         constructor(_x, _y, _worker) {
             this.worker = _worker;
             this.emotion = 0;
             this.position = new Doenertrainer.Vector(_x, _y);
+            this.spawnpoint = new Doenertrainer.Vector(_x, _y);
             this.setPosition(_x, _y);
+            this.setSpawnpoint(_x, _y);
+            this.setActivity(0);
+        }
+        setActivity(_activity) {
+            this.activity = _activity; //set activity //0 = nothing // 1 go warehouse //2 cook // 3gocashbox
+        }
+        setSpawnpoint(_x, _y) {
+            this.spawnpoint.x = _x;
+            this.spawnpoint.y = _y;
+            this.warehousewalkpathback[5] = this.spawnpoint.x;
+            this.cookwalkpath[11] = this.spawnpoint.x;
+            this.cashboxwalkpath[3] = this.spawnpoint.x;
+        }
+        doActivity() {
+            this.timer++;
+            //console.log(this.timer);
+            if (this.activity == 0) {
+                if (this.timer == Doenertrainer.sleep) {
+                    this.emotion = 1;
+                }
+                this.overload = 0;
+            }
+            if (this.activity == 1) {
+                this.doEmotion();
+                // walk to warehouse
+                this.walkthere("right", 0, 8, this.walkstep, this.warehousewalkpath, this.warehousewalkpathDone);
+                this.walkthere("backward", 1, 8, this.walkstep, this.warehousewalkpath, this.warehousewalkpathDone);
+                this.walkthere("right", 2, 8, this.walkstep, this.warehousewalkpath, this.warehousewalkpathDone);
+                this.walkthere("forward", 3, 8, this.walkstep, this.warehousewalkpath, this.warehousewalkpathDone);
+                this.walkthere("left", 4, 8, this.walkstep, this.warehousewalkpath, this.warehousewalkpathDone);
+                this.walkthere("backward", 5, 8, this.walkstep, this.warehousewalkpath, this.warehousewalkpathDone);
+                // walk back from warehouse
+                this.walkback("forward", 0, 8, this.walkstep, this.warehousewalkpathback, this.warehousewalkpathDone);
+                this.walkback("right", 1, 8, this.walkstep, this.warehousewalkpathback, this.warehousewalkpathDone);
+                this.walkback("backward", 2, 8, this.walkstep, this.warehousewalkpathback, this.warehousewalkpathDone);
+                this.walkback("left", 3, 8, this.walkstep, this.warehousewalkpathback, this.warehousewalkpathDone);
+                this.walkback("forward", 4, 8, this.walkstep, this.warehousewalkpathback, this.warehousewalkpathDone);
+                this.walkback("left", 5, 8, this.walkstep, this.warehousewalkpathback, this.warehousewalkpathDone);
+                // reset walksteps
+                if (this.walkstep == 6) {
+                    this.walkstep = 0;
+                }
+                //}
+            }
+            if (this.activity == 2) {
+                this.doEmotion();
+                this.walkthere("left", 0, 8, this.walkstep, this.cookwalkpath, this.cookwalkpathDone);
+                this.walkthere("backward", 1, 8, this.walkstep, this.cookwalkpath, this.cookwalkpathDone);
+                this.walkthere("right", 2, 8, this.walkstep, this.cookwalkpath, this.cookwalkpathDone);
+                this.walkthere("backward", 3, 8, this.walkstep, this.cookwalkpath, this.cookwalkpathDone);
+                this.walkthere("right", 4, 8, this.walkstep, this.cookwalkpath, this.cookwalkpathDone);
+                this.walkthere("backward", 5, 8, this.walkstep, this.cookwalkpath, this.cookwalkpathDone);
+                this.walkthere("right", 6, 8, this.walkstep, this.cookwalkpath, this.cookwalkpathDone);
+                this.walkthere("forward", 7, 8, this.walkstep, this.cookwalkpath, this.cookwalkpathDone);
+                // red sauce
+                this.walkthere("forward", 8, 8, this.walkstep, this.cookwalkpath, this.cookwalkpathDone);
+                //white sauce
+                this.walkthere("forward", 9, 8, this.walkstep, this.cookwalkpath, this.cookwalkpathDone);
+                this.walkthere("forward", 10, 8, this.walkstep, this.cookwalkpath, this.cookwalkpathDone);
+                this.walkthere("left", 11, 8, this.walkstep, this.cookwalkpath, this.cookwalkpathDone);
+                //this.walkthere("left", 13, 8, this.walkstep, this.cookwalkpath, this.cookwalkpathDone);
+                if (this.walkstep == 12) {
+                    this.walkstep = 0;
+                    for (let i = 0; i < this.cookwalkpathDone.length; i++) {
+                        this.cookwalkpathDone[i] = false;
+                    }
+                    this.setActivity(0);
+                }
+            }
+            if (this.activity == 3) {
+                this.doEmotion();
+                this.walkthere("right", 0, 8, this.walkstep, this.cashboxwalkpath, this.cashboxpathDone);
+                this.walkthere("backward", 1, 8, this.walkstep, this.cashboxwalkpath, this.cashboxpathDone);
+                this.walkthere("forward", 2, 8, this.walkstep, this.cashboxwalkpath, this.cashboxpathDone);
+                this.walkthere("left", 3, 8, this.walkstep, this.cashboxwalkpath, this.cashboxpathDone);
+                if (this.walkstep == 4) {
+                    this.walkstep = 0;
+                    for (let i = 0; i < this.cashboxpathDone.length; i++) {
+                        this.cashboxpathDone[i] = false;
+                    }
+                    this.setActivity(0);
+                }
+            }
+        }
+        walkthere(walkdirection, activwalkstep, walkspeed, walkstep, walkpath, walkpathdone) {
+            if (walkpathdone[this.walkstep] == false && this.walkstep == activwalkstep) {
+                for (let i = 0; i < walkspeed; i++) {
+                    if (walkdirection == "backward") {
+                        this.position.y++;
+                    }
+                    if (walkdirection == "forward") {
+                        this.position.y--;
+                    }
+                    if (walkdirection == "left") {
+                        this.position.x--;
+                    }
+                    if (walkdirection == "right") {
+                        this.position.x++;
+                    }
+                    if (this.position.y == walkpath[walkstep]) {
+                        walkpathdone[this.walkstep] = true;
+                        this.walkstep++;
+                        //}
+                        break;
+                    }
+                    if (this.position.x == walkpath[this.walkstep]) {
+                        walkpathdone[this.walkstep] = true;
+                        this.walkstep++;
+                        //}
+                        break;
+                    }
+                }
+            }
+        }
+        walkback(walkdirection, activwalkstep, walkspeed, walkstep, walkpath, walkpathdone) {
+            if (walkpathdone[this.walkstep] == true && this.walkstep == activwalkstep) {
+                for (let i = 0; i < walkspeed; i++) {
+                    if (walkdirection == "backward") {
+                        this.position.y++;
+                    }
+                    if (walkdirection == "forward") {
+                        this.position.y--;
+                    }
+                    if (walkdirection == "left") {
+                        this.position.x--;
+                    }
+                    if (walkdirection == "right") {
+                        this.position.x++;
+                    }
+                    if (this.position.y == walkpath[walkstep]) {
+                        walkpathdone[this.walkstep] = false;
+                        this.walkstep++;
+                        if (walkstep == walkpathdone.length) {
+                            this.setActivity(0);
+                        }
+                        if (this.position.x == this.spawnpoint.x && this.position.y == this.spawnpoint.y) {
+                            console.log(this.position);
+                            console.log(this.spawnpoint);
+                            this.setActivity(0);
+                        }
+                        break;
+                    }
+                    if (this.position.x == walkpath[this.walkstep]) {
+                        walkpathdone[this.walkstep] = false;
+                        this.walkstep++;
+                        if (walkstep == walkpathdone.length) {
+                            this.setActivity(0);
+                        }
+                        if (this.position.x == this.spawnpoint.x && this.position.y == this.spawnpoint.y) {
+                            console.log(this.position);
+                            console.log(this.spawnpoint);
+                            this.setActivity(0);
+                        }
+                        break;
+                    }
+                }
+            }
         }
         setPosition(_x, _y) {
             this.position.x = _x;
             this.position.y = _y;
+        }
+        doEmotion() {
+            this.timer = 0;
+            this.overload++;
+            if (this.overload <= Doenertrainer.overload) {
+                this.emotion = 2;
+            }
+            else {
+                this.emotion = 0;
+            }
         }
         draw() {
             Doenertrainer.ctx.translate(this.position.x, this.position.y);
@@ -861,5 +1410,112 @@ var Doenertrainer;
         Doenertrainer.ctx.resetTransform();
     }
     Doenertrainer.drawEmotionStressed = drawEmotionStressed;
+    function drawLamacun() {
+        Doenertrainer.ctx.scale(3.5, 3.5);
+        Doenertrainer.ctx.save();
+        Doenertrainer.ctx.transform(1.000000, 0.000000, 0.000000, 1.000000, -371.310000, -196.260000);
+        // #path717
+        Doenertrainer.ctx.beginPath();
+        Doenertrainer.ctx.fillStyle = "rgb(255, 255, 255)";
+        Doenertrainer.ctx.strokeStyle = "rgb(0, 0, 0)";
+        Doenertrainer.ctx.lineWidth = 0.217247;
+        Doenertrainer.ctx.lineCap = "butt";
+        Doenertrainer.ctx.lineJoin = "miter";
+        Doenertrainer.ctx.miterLimit = 4;
+        Doenertrainer.ctx.moveTo(367.516250, 199.637920);
+        Doenertrainer.ctx.lineTo(375.072800, 199.637920);
+        Doenertrainer.ctx.lineTo(375.072800, 192.107370);
+        Doenertrainer.ctx.lineTo(367.516250, 192.107370);
+        Doenertrainer.ctx.fill();
+        Doenertrainer.ctx.stroke();
+        // #path719
+        Doenertrainer.ctx.beginPath();
+        Doenertrainer.ctx.fillStyle = "rgb(170, 68, 0)";
+        Doenertrainer.ctx.strokeStyle = "rgb(0, 0, 0)";
+        Doenertrainer.ctx.lineWidth = 0.217247;
+        Doenertrainer.ctx.lineCap = "butt";
+        Doenertrainer.ctx.lineJoin = "miter";
+        Doenertrainer.ctx.miterLimit = 4;
+        Doenertrainer.ctx.moveTo(371.310080, 196.260020);
+        Doenertrainer.ctx.bezierCurveTo(371.838840, 196.260020, 372.305540, 196.011620, 372.305540, 195.671280);
+        Doenertrainer.ctx.bezierCurveTo(372.305540, 195.362230, 371.838840, 195.082540, 371.310080, 195.082540);
+        Doenertrainer.ctx.bezierCurveTo(370.750290, 195.082540, 370.283600, 195.362110, 370.283600, 195.671280);
+        Doenertrainer.ctx.bezierCurveTo(370.283600, 196.011490, 370.750290, 196.260020, 371.310080, 196.260020);
+        Doenertrainer.ctx.fill();
+        Doenertrainer.ctx.stroke();
+        // #path721
+        Doenertrainer.ctx.beginPath();
+        Doenertrainer.ctx.fillStyle = "rgb(170, 68, 0)";
+        Doenertrainer.ctx.strokeStyle = "rgb(0, 0, 0)";
+        Doenertrainer.ctx.lineWidth = 0.217247;
+        Doenertrainer.ctx.lineCap = "butt";
+        Doenertrainer.ctx.lineJoin = "miter";
+        Doenertrainer.ctx.miterLimit = 4;
+        Doenertrainer.ctx.moveTo(370.283880, 197.065760);
+        Doenertrainer.ctx.bezierCurveTo(370.843670, 197.065760, 371.310360, 196.786190, 371.310360, 196.477020);
+        Doenertrainer.ctx.bezierCurveTo(371.310360, 196.136810, 370.843670, 195.888270, 370.283880, 195.888270);
+        Doenertrainer.ctx.bezierCurveTo(369.755120, 195.888270, 369.288420, 196.136680, 369.288420, 196.477020);
+        Doenertrainer.ctx.bezierCurveTo(369.288420, 196.786070, 369.755120, 197.065760, 370.283880, 197.065760);
+        Doenertrainer.ctx.fill();
+        Doenertrainer.ctx.stroke();
+        // #path723
+        Doenertrainer.ctx.beginPath();
+        Doenertrainer.ctx.fillStyle = "rgb(170, 68, 0)";
+        Doenertrainer.ctx.strokeStyle = "rgb(0, 0, 0)";
+        Doenertrainer.ctx.lineWidth = 0.217247;
+        Doenertrainer.ctx.lineCap = "butt";
+        Doenertrainer.ctx.lineJoin = "miter";
+        Doenertrainer.ctx.miterLimit = 4;
+        Doenertrainer.ctx.moveTo(372.087490, 197.375650);
+        Doenertrainer.ctx.bezierCurveTo(372.647280, 197.375650, 373.113980, 197.127240, 373.113980, 196.786910);
+        Doenertrainer.ctx.bezierCurveTo(373.113980, 196.477850, 372.647280, 196.198170, 372.087490, 196.198170);
+        Doenertrainer.ctx.bezierCurveTo(371.558730, 196.198170, 371.092040, 196.477730, 371.092040, 196.786910);
+        Doenertrainer.ctx.bezierCurveTo(371.092040, 197.127120, 371.558730, 197.375650, 372.087490, 197.375650);
+        Doenertrainer.ctx.fill();
+        Doenertrainer.ctx.stroke();
+        Doenertrainer.ctx.restore();
+        Doenertrainer.ctx.resetTransform();
+    }
+    Doenertrainer.drawLamacun = drawLamacun;
+    function drawYufka() {
+        Doenertrainer.ctx.scale(3.5, 3.5);
+        Doenertrainer.ctx.beginPath();
+        Doenertrainer.ctx.fillStyle = "rgb(128, 128, 128)";
+        Doenertrainer.ctx.strokeStyle = "rgb(0, 0, 0)";
+        Doenertrainer.ctx.lineWidth = 0.217241;
+        Doenertrainer.ctx.lineCap = "butt";
+        Doenertrainer.ctx.lineJoin = "miter";
+        Doenertrainer.ctx.miterLimit = 4;
+        Doenertrainer.ctx.moveTo(-3.453430, 0.346598);
+        Doenertrainer.ctx.lineTo(2.734970, -2.132365);
+        Doenertrainer.ctx.bezierCurveTo(3.170692, -2.318859, 3.668427, -2.101368, 3.823541, -1.666573);
+        Doenertrainer.ctx.lineTo(3.917041, -1.480080);
+        Doenertrainer.ctx.bezierCurveTo(4.103136, -1.045366, 3.885941, -0.520050, 3.450327, -0.364792);
+        Doenertrainer.ctx.lineTo(-2.707021, 2.145069);
+        Doenertrainer.ctx.bezierCurveTo(-3.142744, 2.300415, -3.671479, 2.083174, -3.826674, 1.649540);
+        Doenertrainer.ctx.lineTo(-3.919774, 1.463045);
+        Doenertrainer.ctx.bezierCurveTo(-4.105869, 1.029622, -3.888674, 0.534093, -3.453060, 0.347758);
+        Doenertrainer.ctx.fill();
+        Doenertrainer.ctx.stroke();
+        Doenertrainer.ctx.resetTransform();
+    }
+    Doenertrainer.drawYufka = drawYufka;
+    function drawDoner() {
+        Doenertrainer.ctx.scale(3.5, 3.5);
+        Doenertrainer.ctx.beginPath();
+        Doenertrainer.ctx.fillStyle = "rgb(153, 153, 153)";
+        Doenertrainer.ctx.strokeStyle = "rgb(0, 0, 0)";
+        Doenertrainer.ctx.lineWidth = 0.217247;
+        Doenertrainer.ctx.lineCap = "butt";
+        Doenertrainer.ctx.lineJoin = "miter";
+        Doenertrainer.ctx.miterLimit = 4;
+        Doenertrainer.ctx.moveTo(3.356448, -0.679305);
+        Doenertrainer.ctx.bezierCurveTo(2.982985, 1.179919, 1.179590, 2.388516, -0.686439, 2.016670);
+        Doenertrainer.ctx.bezierCurveTo(-2.552348, 1.645336, -3.734104, -0.183358, -3.360969, -2.011853);
+        Doenertrainer.ctx.fill();
+        Doenertrainer.ctx.stroke();
+        Doenertrainer.ctx.resetTransform();
+    }
+    Doenertrainer.drawDoner = drawDoner;
 })(Doenertrainer || (Doenertrainer = {}));
 //# sourceMappingURL=Build.js.map

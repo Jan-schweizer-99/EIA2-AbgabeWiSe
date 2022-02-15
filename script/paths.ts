@@ -407,4 +407,112 @@ namespace Doenertrainer {
         ctx.stroke();
         ctx.resetTransform();
     }
+    export function drawLamacun(): void {
+        ctx.scale(3.5, 3.5);
+        ctx.save();
+        ctx.transform(1.000000, 0.000000, 0.000000, 1.000000, -371.310000, -196.260000);
+        
+    // #path717
+        ctx.beginPath();
+        ctx.fillStyle = "rgb(255, 255, 255)";
+        ctx.strokeStyle = "rgb(0, 0, 0)";
+        ctx.lineWidth = 0.217247;
+        ctx.lineCap = "butt";
+        ctx.lineJoin = "miter";
+        ctx.miterLimit = 4;
+        ctx.moveTo(367.516250, 199.637920);
+        ctx.lineTo(375.072800, 199.637920);
+        ctx.lineTo(375.072800, 192.107370);
+        ctx.lineTo(367.516250, 192.107370);
+        ctx.fill();
+        ctx.stroke();
+        
+    // #path719
+        ctx.beginPath();
+        ctx.fillStyle = "rgb(170, 68, 0)";
+        ctx.strokeStyle = "rgb(0, 0, 0)";
+        ctx.lineWidth = 0.217247;
+        ctx.lineCap = "butt";
+        ctx.lineJoin = "miter";
+        ctx.miterLimit = 4;
+        ctx.moveTo(371.310080, 196.260020);
+        ctx.bezierCurveTo(371.838840, 196.260020, 372.305540, 196.011620, 372.305540, 195.671280);
+        ctx.bezierCurveTo(372.305540, 195.362230, 371.838840, 195.082540, 371.310080, 195.082540);
+        ctx.bezierCurveTo(370.750290, 195.082540, 370.283600, 195.362110, 370.283600, 195.671280);
+        ctx.bezierCurveTo(370.283600, 196.011490, 370.750290, 196.260020, 371.310080, 196.260020);
+        ctx.fill();
+        ctx.stroke();
+        
+    // #path721
+        ctx.beginPath();
+        ctx.fillStyle = "rgb(170, 68, 0)";
+        ctx.strokeStyle = "rgb(0, 0, 0)";
+        ctx.lineWidth = 0.217247;
+        ctx.lineCap = "butt";
+        ctx.lineJoin = "miter";
+        ctx.miterLimit = 4;
+        ctx.moveTo(370.283880, 197.065760);
+        ctx.bezierCurveTo(370.843670, 197.065760, 371.310360, 196.786190, 371.310360, 196.477020);
+        ctx.bezierCurveTo(371.310360, 196.136810, 370.843670, 195.888270, 370.283880, 195.888270);
+        ctx.bezierCurveTo(369.755120, 195.888270, 369.288420, 196.136680, 369.288420, 196.477020);
+        ctx.bezierCurveTo(369.288420, 196.786070, 369.755120, 197.065760, 370.283880, 197.065760);
+        ctx.fill();
+        ctx.stroke();
+        
+    // #path723
+        ctx.beginPath();
+        ctx.fillStyle = "rgb(170, 68, 0)";
+        ctx.strokeStyle = "rgb(0, 0, 0)";
+        ctx.lineWidth = 0.217247;
+        ctx.lineCap = "butt";
+        ctx.lineJoin = "miter";
+        ctx.miterLimit = 4;
+        ctx.moveTo(372.087490, 197.375650);
+        ctx.bezierCurveTo(372.647280, 197.375650, 373.113980, 197.127240, 373.113980, 196.786910);
+        ctx.bezierCurveTo(373.113980, 196.477850, 372.647280, 196.198170, 372.087490, 196.198170);
+        ctx.bezierCurveTo(371.558730, 196.198170, 371.092040, 196.477730, 371.092040, 196.786910);
+        ctx.bezierCurveTo(371.092040, 197.127120, 371.558730, 197.375650, 372.087490, 197.375650);
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+        ctx.resetTransform();
+    }
+    export function drawYufka(): void {
+        ctx.scale(3.5, 3.5);
+        ctx.beginPath();
+        ctx.fillStyle = "rgb(128, 128, 128)";
+        ctx.strokeStyle = "rgb(0, 0, 0)";
+        ctx.lineWidth = 0.217241;
+        ctx.lineCap = "butt";
+        ctx.lineJoin = "miter";
+        ctx.miterLimit = 4;
+        ctx.moveTo(-3.453430, 0.346598);
+        ctx.lineTo(2.734970, -2.132365);
+        ctx.bezierCurveTo(3.170692, -2.318859, 3.668427, -2.101368, 3.823541, -1.666573);
+        ctx.lineTo(3.917041, -1.480080);
+        ctx.bezierCurveTo(4.103136, -1.045366, 3.885941, -0.520050, 3.450327, -0.364792);
+        ctx.lineTo(-2.707021, 2.145069);
+        ctx.bezierCurveTo(-3.142744, 2.300415, -3.671479, 2.083174, -3.826674, 1.649540);
+        ctx.lineTo(-3.919774, 1.463045);
+        ctx.bezierCurveTo(-4.105869, 1.029622, -3.888674, 0.534093, -3.453060, 0.347758);
+        ctx.fill();
+        ctx.stroke();
+        ctx.resetTransform();
+    }
+    export function drawDoner(): void {
+        ctx.scale(3.5, 3.5);
+        ctx.beginPath();
+        ctx.fillStyle = "rgb(153, 153, 153)";
+        ctx.strokeStyle = "rgb(0, 0, 0)";
+        ctx.lineWidth = 0.217247;
+        ctx.lineCap = "butt";
+        ctx.lineJoin = "miter";
+        ctx.miterLimit = 4;
+        ctx.moveTo(3.356448, -0.679305);
+        ctx.bezierCurveTo(2.982985, 1.179919, 1.179590, 2.388516, -0.686439, 2.016670);
+        ctx.bezierCurveTo(-2.552348, 1.645336, -3.734104, -0.183358, -3.360969, -2.011853);
+        ctx.fill();
+        ctx.stroke();
+        ctx.resetTransform();
+    }
 }
