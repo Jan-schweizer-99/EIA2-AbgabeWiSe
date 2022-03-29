@@ -78,7 +78,7 @@ namespace Doenertrainer {
         if (workerValue == 2) {
             worker[0] = new Worker(58, 686, 0);
             worker[1] = new Worker(98, 686, 1);
-        }
+        } 
         if (workerValue == 1) {
             worker[0] = new Worker(58, 686, 0);
         }
